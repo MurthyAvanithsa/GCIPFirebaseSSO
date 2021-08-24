@@ -30,11 +30,12 @@ public class MainActivity extends AppCompatActivity {
 
         final Button button = findViewById(R.id.loginokta);
         final TextView text = findViewById(R.id.idToken);
+
         button.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
                 // Code here executes on main thread after user presses button
-                String url = "http://192.168.0.106:8080";
+                String url = "https://8417-124-123-161-143.ngrok.io";
                 CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
                 // set toolbar color and/or setting custom actions before invoking build()
                 // Once ready, call CustomTabsIntent.Builder.build() to create a CustomTabsIntent
@@ -50,14 +51,30 @@ public class MainActivity extends AppCompatActivity {
         String action = intent.getAction();
         try{
             Uri data = intent.getData();
+            //ID token
             String authKey = data.getQueryParameter("key");
             String status = data.getQueryParameter("status");
+            // REFRESH TOKEN
+            String refreshToken = data.getQueryParameter("refreshToken");
+
+            // NOTE
+            // We have to exchange the refreshToken to get a new ID token
+            // Google provides a public endpoint to this
+            // https://securetoken.googleapis.com/v1/token?key=[WEB_KEY]
+            // We can find the WEB_KEY from a configured android firebase SDK as bellow
+            // FirebaseApp.getInstance().getOptions().getApiKey()
+            // The above code would extract WEB_KEY from google.services.json file
+            // If you dont have the SDK configured in the android project , you can get this from Firebase console
+
+
             if(status.equals("ERROR")){
                 this.isError=true;
             }else if(status.equals("SUCCESS")){
                 this.isAuthnticated = true;
                 Toast.makeText(getApplicationContext(),"Login success" , Toast.LENGTH_LONG).show();
-                Log.d("INTENT_FILTER", authKey);
+                Log.d("ID_TOKEN", authKey);
+                Log.d("REFRESH_TOKEN", refreshToken);
+
                 text.setText(authKey);
             }
 
